@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Transações</title>
+    <style>
+        body {
+            float: left;
+        }
+
+        table {
+            border: 1px black solid;
+            margin-top: 20px;
+        }
+
+        table td {
+            padding: 10px;
+            width: 100px;
+        }
+
+        #new_transaction_frm {
+            margin-top: 20px;
+            border: 1px black solid;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="new_transaction_btn">Nova transação</button>
+    <table>
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td>Cliente</td>
+                <td>Estabelecimento</td>
+                <td>Valor (R$)</td>
+            </tr>
+        </thead>
+        <tbody id="transaction_table">
+
+        </tbody>
+    </table>
+
+    <form id="new_transaction_frm">
+        <h4>New transaction</h4>
+        <label>Name</label>
+        <br />
+        <select id="new_transaction_client_select">
+            <option selected>Ricaro Vaz Corrêa</option>
+            <option>Lê</option>
+            <option>Gabigo(r)</option>
+        </select>
+        <br />
+        <br />
+        <label>Estabelecimento</label><br />
+        <select id="new_transaction_stablishment">
+            <option selected>Casa do gabiro</option>
+            <option>Açai</option>
+            <option>Magnum</option>
+        </select>
+        <br />
+        <br />
+        <label>Valor</label>
+        <br />
+        <input type="number" id="new_transaction_value" />
+        <br />
+        <br />
+        <input type="button" id="new_transaction_cancel_btn" value="Cancelar" />
+        <input type="submit" value="Salvar" />
+    </form>
+
+    <script>
+        const transactions = [];
+        let editingTransaction = null;
+
+        const tableDOMElement = document.getElementById("transaction_table");
+        const newTransactionBtnDOMElement = document.getElementById("new_transaction_btn");
+        const newTransactionFrmDOMElement = document.getElementById("new_transaction_frm");
+        const newTransactionCancelBTNDOMElement = document.getElementById("new_transaction_cancel_btn");
+
+        const newTransactionFrmClientSelectElement = document.getElementById("new_transaction_client_select");
+        const newTransactionFrmStablishmentSelectElement = document.getElementById("new_transaction_stablishment");
+        const newTransactionFrmValueDOMElement = document.getElementById("new_transaction_value");
+
+        const renderTableBody = () => {
+            let transactionTableBodyHTML = '';
+
+            for (let transaction of transactions) {
+                transactionTableBodyHTML += `<tr><td>${transaction.id}<td/><td>${transaction.client}<td/><td>${transaction.stablishment}<td/><td>${transaction.value}<td/></tr>`;
+            }
+
+            tableDOMElement.innerHTML = transactionTableBodyHTML;
+        }
+
+        const createTransaction = (transaction) => {
+            transactions.push(transaction);
+            renderTableBody();
+        }
+
+        const showNewTransactionForm = () => {
+            newTransactionFrmDOMElement.style.display = "block";
+        }
+
+        const hideNewTransactionForm = () => {
+            newTransactionFrmDOMElement.style.display = "none";
+            newTransactionFrmValueDOMElement.value = "";
+        }
+
+        const handleNewTransactionCancelButtonClick = (e) => {
+            editingTransaction = null;
+            hideNewTransactionForm();
+        }
+
+        const handleNewTransactionButtonClick = (e) => {
+            showNewTransactionForm();
+        }
+
+        const handleNewTransactionFormSubmit = (e) => {
+            e.preventDefault();
+
+            const validatedForm = validateForm();
+            if (!validatedForm) {
+                return;
+            }
+
+            createTransaction(validatedForm);
+
+            hideNewTransactionForm();
+        }
+
+        const validateForm = () => {
+            const selectedClient = newTransactionFrmClientSelectElement.options[newTransactionFrmClientSelectElement.selectedIndex].text;
+            const selectedStablishment = newTransactionFrmStablishmentSelectElement.options[newTransactionFrmStablishmentSelectElement.selectedIndex].text;
+            const value = newTransactionFrmValueDOMElement.value;
+
+            if (!selectedClient || !selectedStablishment || !value) {
+                return;
+            }
+
+            return {
+                id: Date.now(),
+                client: selectedClient,
+                stablishment: selectedStablishment,
+                value: value
+            }
+        }
+
+        newTransactionBtnDOMElement.addEventListener('click', handleNewTransactionButtonClick);
+        newTransactionCancelBTNDOMElement.addEventListener('click', handleNewTransactionCancelButtonClick);
+        newTransactionFrmDOMElement.addEventListener('submit', handleNewTransactionFormSubmit);
+    </script>
+
+</body>
+
+</html>
